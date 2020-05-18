@@ -6,9 +6,9 @@
 # Created on 2012-09-12 22:39:57
 # form requests&tornado
 
-import UserDict
-import cookielib
-from urlparse import urlparse
+from collections import MutableMapping
+from http import cookiejar
+from urllib.parse import urlparse
 from tornado import httpclient, httputil
 
 class MockRequest(object):
@@ -113,7 +113,7 @@ def create_cookie(name, value, httpOnly=None, **kwargs):
     result['domain_initial_dot'] = result['domain'].startswith('.')
     result['path_specified'] = bool(result['path'])
 
-    return cookielib.Cookie(**result)
+    return cookiejar.Cookie(**result)
 
 def dump_cookie(cookie):
     result = {}
@@ -138,7 +138,7 @@ def remove_cookie_by_name(cookiejar, name, domain=None, path=None):
     for domain, path, name in clearables:
         cookiejar.clear(domain, path, name)
 
-class CookieSession(cookielib.CookieJar, UserDict.DictMixin):
+class CookieSession(cookiejar.CookieJar, MutableMapping):
     def extract_cookies_to_jar(self, request, response):
         """Extract the cookies from the response into a CookieJar.
 
@@ -168,14 +168,14 @@ class CookieSession(cookielib.CookieJar, UserDict.DictMixin):
 
     def to_json(self):
         result = []
-        for cookie in cookielib.CookieJar.__iter__(self):
+        for cookie in cookiejar.CookieJar.__iter__(self):
             result.append(dump_cookie(cookie))
         return result
 
     def __getitem__(self, name):
-        if isinstance(name, cookielib.Cookie):
+        if isinstance(name, cookiejar.Cookie):
             return name.value
-        for cookie in cookielib.CookieJar.__iter__(self):
+        for cookie in cookiejar.CookieJar.__iter__(self):
             if cookie.name == name:
                 return cookie.value
         raise KeyError(name)
@@ -191,7 +191,7 @@ class CookieSession(cookielib.CookieJar, UserDict.DictMixin):
 
     def keys(self):
         result = []
-        for cookie in cookielib.CookieJar.__iter__(self):
+        for cookie in cookiejar.CookieJar.__iter__(self):
             result.append(cookie.name)
         return result
 

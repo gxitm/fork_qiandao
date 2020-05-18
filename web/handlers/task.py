@@ -12,7 +12,7 @@ import datetime
 import pytz
 import send2phone
 
-from base import *
+from .base import *
 
 def calNextTimestamp(etime, todayflg):
     tz = pytz.timezone('Asia/Shanghai')

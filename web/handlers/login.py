@@ -13,7 +13,7 @@ from tornado import gen
 from tornado.ioloop import IOLoop
 
 import config
-from base import *
+from .base import *
 from libs import utils
 
 class LoginHandler(BaseHandler):
@@ -119,7 +119,7 @@ class RegisterHandler(BaseHandler):
         </tr>
         </tbody>
         </table>
-        """ % (config.domain, config.domain, verified_code, config.domain, verified_code, config.domain, verified_code), async=True)
+        """ % (config.domain, config.domain, verified_code, config.domain, verified_code, config.domain, verified_code), a_sync=True)
 
         def get_result(future):
             try:
@@ -244,7 +244,7 @@ class PasswordResetHandler(BaseHandler):
         </tbody>
         </table>
 
-        """ % (config.domain, config.domain, verified_code, config.domain, verified_code, config.domain, verified_code), async=True)
+        """ % (config.domain, config.domain, verified_code, config.domain, verified_code, config.domain, verified_code), a_sync=True)
 
         def get_result(future):
             try:

@@ -11,7 +11,7 @@ import random
 import urllib
 import base64
 import logging
-import urlparse
+from urllib.parse import urlparse
 from datetime import datetime
 
 try:
@@ -219,7 +219,7 @@ class Fetcher(object):
                 _from = _from[7:]
                 return response.headers.get(_from, '')
             elif _from == 'header':
-                return unicode(response.headers)
+                return str(response.headers, 'utf-8')
             else:
                 return ''
 

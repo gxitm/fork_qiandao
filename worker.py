@@ -134,15 +134,15 @@ class MainWorker(object):
         tpl = self.db.tpl.get(task['tplid'], fields=('id', 'userid', 'sitename', 'siteurl', 'tpl',
             'interval', 'last_success'))
         ontime = self.db.task.get(task['id'], fields=('ontime', 'ontimeflg'))
-        
+
         notice = self.db.user.get(task['userid'], fields=('skey', 'barkurl', 'noticeflg', 'wxpusher'))
         temp = notice['wxpusher'].split(";")
         wxpusher_token = temp[0] if (len(temp) >= 2) else ""
-        wxpusher_uid = temp[1] if (len(temp) >= 2) else "" 
+        wxpusher_uid = temp[1] if (len(temp) >= 2) else ""
         pushno2b = send2phone.send2phone(barkurl=notice['barkurl'])
         pushno2s = send2phone.send2phone(skey=notice['skey'])
-        pushno2w = send2phone.send2phone(wxpusher_token=wxpusher_token, wxpusher_uid=wxpusher_uid)               
-        
+        pushno2w = send2phone.send2phone(wxpusher_token=wxpusher_token, wxpusher_uid=wxpusher_uid)
+
         if task['disabled']:
             self.db.tasklog.add(task['id'], False, msg='task disabled.')
             self.db.task.mod(task['id'], next=None, disabled=1)
@@ -207,7 +207,7 @@ class MainWorker(object):
         except Exception as e:
             # failed feedback
             next_time_delta = self.failed_count_to_time(task['last_failed_count'], tpl['interval'])
-                        
+
             t = datetime.datetime.now().strftime('%m-%d %H:%M:%S')
             title = u"签到任务 {0} 失败".format(tpl['sitename'])
             if next_time_delta:
@@ -227,7 +227,7 @@ class MainWorker(object):
                     pushno2s.send2s(title, u"任务已禁用")
                     pushno2w.send2wxpusher(title+u"任务已禁用")
 
-            self.db.tasklog.add(task['id'], success=False, msg=unicode(e))
+            self.db.tasklog.add(task['id'], success=False, msg=str(e, 'utf-8'))
             self.db.task.mod(task['id'],
                     last_failed=time.time(),
                     failed_count=task['failed_count']+1,
@@ -248,14 +248,13 @@ class MainWorker(object):
 下一次重试在一天之后，为防止签到中断，给您发送这份邮件。
 
 访问： http://%(domain)s/task/%(taskid)s/log 查看日志。
-                    """ % dict(
-                        sitename=tpl['sitename'] or u'未命名',
+                    """ % dict(sitename=tpl['sitename'] or u'未命名',
                         siteurl=tpl['siteurl'] or u'',
                         cnt=task['last_failed_count'] + 1,
                         disable=u"因连续多次失败，已停止。" if disabled else u"",
                         domain=config.domain,
                         taskid=task['id'],
-                        ), async=True)
+                        ), a_sync=True)
                 except Exception as e:
                     logging.error('send mail error: %r', e)
 

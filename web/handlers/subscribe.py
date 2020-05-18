@@ -6,7 +6,7 @@
 # Created on 2014-08-08 21:06:02
 
 import time
-from base import *
+from .base import *
 
 import requests
 import re
